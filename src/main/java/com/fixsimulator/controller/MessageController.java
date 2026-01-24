@@ -129,65 +129,129 @@ public class MessageController {
     }
     
     /**
-     * 根据ClOrdId查询消息
+     * 根据ClOrdId查询消息（V1.0.1: 支持可选查询）
      */
-    @GetMapping("/clordid/{clOrdId}")
+    @GetMapping("/clordid")
     public ResponseEntity<List<FixMessageEntity>> getMessagesByClOrdId(
-            @PathVariable String clOrdId,
+            @RequestParam(required = false) String clOrdId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
-        
-        // 首先通过解析字段找到相关的消息ID
-        List<ParsedFieldEntity> parsedFields = parsedFieldService.getByClOrdId(clOrdId);
-        List<Long> messageIds = parsedFields.stream()
-                .map(ParsedFieldEntity::getMessageId)
-                .toList();
-        
-        // 然后获取对应的消息
-        List<FixMessageEntity> messages = fixMessageService.getAllMessages().stream()
-                .filter(msg -> messageIds.contains(msg.getId()))
-                .toList();
-        
+
+        List<FixMessageEntity> messages;
+
+        if (clOrdId != null && !clOrdId.isEmpty()) {
+            // 如果提供了ClOrdId，则按ClOrdId查询
+            List<ParsedFieldEntity> parsedFields = parsedFieldService.getByClOrdId(clOrdId);
+            List<Long> messageIds = parsedFields.stream()
+                    .map(ParsedFieldEntity::getMessageId)
+                    .toList();
+
+            messages = fixMessageService.getAllMessages().stream()
+                    .filter(msg -> messageIds.contains(msg.getId()))
+                    .toList();
+        } else {
+            // 如果没有提供ClOrdId，则查询最近一天的数据
+            messages = fixMessageService.getRecentMessages();
+        }
+
         // 手动实现分页
         int start = Math.min(page * size, messages.size());
         int end = Math.min((page + 1) * size, messages.size());
-        
+
         if (start >= end) {
             return ResponseEntity.ok(List.of());
         }
-        
+
         List<FixMessageEntity> pagedMessages = messages.subList(start, end);
         return ResponseEntity.ok(pagedMessages);
     }
-    
+
     /**
-     * 根据Symbol查询消息
+     * 根据Symbol查询消息（V1.0.1: 支持可选查询）
      */
-    @GetMapping("/symbol/{symbol}")
+    @GetMapping("/symbol")
     public ResponseEntity<List<FixMessageEntity>> getMessagesBySymbol(
-            @PathVariable String symbol,
+            @RequestParam(required = false) String symbol,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
-        
-        // 首先通过解析字段找到相关的消息ID
-        List<ParsedFieldEntity> parsedFields = parsedFieldService.getBySymbol(symbol);
-        List<Long> messageIds = parsedFields.stream()
-                .map(ParsedFieldEntity::getMessageId)
-                .toList();
-        
-        // 然后获取对应的消息
-        List<FixMessageEntity> messages = fixMessageService.getAllMessages().stream()
-                .filter(msg -> messageIds.contains(msg.getId()))
-                .toList();
-        
+
+        List<FixMessageEntity> messages;
+
+        if (symbol != null && !symbol.isEmpty()) {
+            // 如果提供了Symbol，则按Symbol查询
+            List<ParsedFieldEntity> parsedFields = parsedFieldService.getBySymbol(symbol);
+            List<Long> messageIds = parsedFields.stream()
+                    .map(ParsedFieldEntity::getMessageId)
+                    .toList();
+
+            messages = fixMessageService.getAllMessages().stream()
+                    .filter(msg -> messageIds.contains(msg.getId()))
+                    .toList();
+        } else {
+            // 如果没有提供Symbol，则查询最近一天的数据
+            messages = fixMessageService.getRecentMessages();
+        }
+
         // 手动实现分页
         int start = Math.min(page * size, messages.size());
         int end = Math.min((page + 1) * size, messages.size());
-        
+
         if (start >= end) {
             return ResponseEntity.ok(List.of());
         }
-        
+
+        List<FixMessageEntity> pagedMessages = messages.subList(start, end);
+        return ResponseEntity.ok(pagedMessages);
+    }
+
+    /**
+     * 根据ClOrdId和Symbol查询消息（V1.0.1: 支持可选参数组合）
+     */
+    @GetMapping("/search")
+    public ResponseEntity<List<FixMessageEntity>> getMessagesByClOrdIdAndSymbol(
+            @RequestParam(required = false) String clOrdId,
+            @RequestParam(required = false) String symbol,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        List<FixMessageEntity> messages;
+
+        if ((clOrdId == null || clOrdId.isEmpty()) && (symbol == null || symbol.isEmpty())) {
+            // 两者都为空，查询最近一天的数据
+            messages = fixMessageService.getRecentMessages();
+        } else if (clOrdId != null && !clOrdId.isEmpty() && symbol != null && !symbol.isEmpty()) {
+            // 两者都不为空，查询两者的交集
+            messages = fixMessageService.getMessagesByClOrdIdAndSymbol(clOrdId, symbol);
+        } else if (clOrdId != null && !clOrdId.isEmpty()) {
+            // 只有ClOrdId不为空
+            List<ParsedFieldEntity> parsedFields = parsedFieldService.getByClOrdId(clOrdId);
+            List<Long> messageIds = parsedFields.stream()
+                    .map(ParsedFieldEntity::getMessageId)
+                    .toList();
+
+            messages = fixMessageService.getAllMessages().stream()
+                    .filter(msg -> messageIds.contains(msg.getId()))
+                    .toList();
+        } else {
+            // 只有Symbol不为空
+            List<ParsedFieldEntity> parsedFields = parsedFieldService.getBySymbol(symbol);
+            List<Long> messageIds = parsedFields.stream()
+                    .map(ParsedFieldEntity::getMessageId)
+                    .toList();
+
+            messages = fixMessageService.getAllMessages().stream()
+                    .filter(msg -> messageIds.contains(msg.getId()))
+                    .toList();
+        }
+
+        // 手动实现分页
+        int start = Math.min(page * size, messages.size());
+        int end = Math.min((page + 1) * size, messages.size());
+
+        if (start >= end) {
+            return ResponseEntity.ok(List.of());
+        }
+
         List<FixMessageEntity> pagedMessages = messages.subList(start, end);
         return ResponseEntity.ok(pagedMessages);
     }

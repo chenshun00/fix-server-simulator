@@ -15,18 +15,17 @@ public class ResponseController {
     private ResponseService responseService;
     
     /**
-     * 发送ExecutionReport回报 - 部分成交
+     * 发送ExecutionReport回报 - 部分成交（V1.0.1: 从报文数据中推导sessionKey）
      */
     @PostMapping("/execution-report/partial-fill")
     public ResponseEntity<?> sendPartialFillExecutionReport(
-            @RequestParam String sessionKey,
             @RequestParam String clOrdId,
             @RequestParam String execType,
             @RequestParam String ordStatus,
             @RequestParam BigDecimal lastQty,
             @RequestParam BigDecimal cumQty,
             @RequestParam BigDecimal leavesQty) {
-        
+
         try {
             // 验证必需参数
             if (execType == null || execType.isEmpty()) {
@@ -44,10 +43,10 @@ public class ResponseController {
             if (leavesQty == null) {
                 return ResponseEntity.badRequest().body("Parameter 'leavesQty' is required");
             }
-            
-            boolean success = responseService.sendExecutionReport(
-                    sessionKey, clOrdId, execType, ordStatus, lastQty, cumQty, leavesQty);
-            
+
+            boolean success = responseService.sendExecutionReportWithDerivedSession(
+                    clOrdId, execType, ordStatus, lastQty, cumQty, leavesQty);
+
             if (success) {
                 return ResponseEntity.ok().body("Partial fill execution report sent successfully");
             } else {
@@ -59,20 +58,19 @@ public class ResponseController {
             return ResponseEntity.status(500).body("Error sending execution report: " + e.getMessage());
         }
     }
-    
+
     /**
-     * 发送ExecutionReport回报 - 完全成交
+     * 发送ExecutionReport回报 - 完全成交（V1.0.1: 从报文数据中推导sessionKey）
      */
     @PostMapping("/execution-report/fill")
     public ResponseEntity<?> sendFillExecutionReport(
-            @RequestParam String sessionKey,
             @RequestParam String clOrdId,
             @RequestParam String execType,
             @RequestParam String ordStatus,
             @RequestParam BigDecimal lastQty,
             @RequestParam BigDecimal cumQty,
             @RequestParam BigDecimal leavesQty) {
-        
+
         try {
             // 验证必需参数
             if (execType == null || execType.isEmpty()) {
@@ -90,10 +88,10 @@ public class ResponseController {
             if (leavesQty == null) {
                 return ResponseEntity.badRequest().body("Parameter 'leavesQty' is required");
             }
-            
-            boolean success = responseService.sendExecutionReport(
-                    sessionKey, clOrdId, execType, ordStatus, lastQty, cumQty, leavesQty);
-            
+
+            boolean success = responseService.sendExecutionReportWithDerivedSession(
+                    clOrdId, execType, ordStatus, lastQty, cumQty, leavesQty);
+
             if (success) {
                 return ResponseEntity.ok().body("Fill execution report sent successfully");
             } else {
@@ -105,18 +103,17 @@ public class ResponseController {
             return ResponseEntity.status(500).body("Error sending execution report: " + e.getMessage());
         }
     }
-    
+
     /**
-     * 发送New回报（已报）
+     * 发送New回报（已报）（V1.0.1: 从报文数据中推导sessionKey）
      */
     @PostMapping("/execution-report/new")
     public ResponseEntity<?> sendNewOrderAck(
-            @RequestParam String sessionKey,
             @RequestParam String clOrdId) {
-        
+
         try {
-            boolean success = responseService.sendNewOrderAck(sessionKey, clOrdId);
-            
+            boolean success = responseService.sendNewOrderAckWithDerivedSession(clOrdId);
+
             if (success) {
                 return ResponseEntity.ok().body("New order acknowledgment sent successfully");
             } else {
@@ -128,19 +125,18 @@ public class ResponseController {
             return ResponseEntity.status(500).body("Error sending new order acknowledgment: " + e.getMessage());
         }
     }
-    
+
     /**
-     * 发送Reject回报
+     * 发送Reject回报（V1.0.1: 从报文数据中推导sessionKey）
      */
     @PostMapping("/reject")
     public ResponseEntity<?> sendReject(
-            @RequestParam String sessionKey,
             @RequestParam String clOrdId,
             @RequestParam(required = false) String text) {
-        
+
         try {
-            boolean success = responseService.sendReject(sessionKey, clOrdId, text);
-            
+            boolean success = responseService.sendRejectWithDerivedSession(clOrdId, text);
+
             if (success) {
                 return ResponseEntity.ok().body("Reject message sent successfully");
             } else {
@@ -152,17 +148,16 @@ public class ResponseController {
             return ResponseEntity.status(500).body("Error sending reject message: " + e.getMessage());
         }
     }
-    
+
     /**
-     * 发送订单修改确认
+     * 发送订单修改确认（V1.0.1: 从报文数据中推导sessionKey）
      */
     @PostMapping("/execution-report/modify")
     public ResponseEntity<?> sendOrderModifyConfirmation(
-            @RequestParam String sessionKey,
             @RequestParam String clOrdId,
             @RequestParam String execType,
             @RequestParam String ordStatus) {
-        
+
         try {
             // 验证必需参数
             if (execType == null || execType.isEmpty()) {
@@ -171,9 +166,9 @@ public class ResponseController {
             if (ordStatus == null || ordStatus.isEmpty()) {
                 return ResponseEntity.badRequest().body("Parameter 'ordStatus' is required");
             }
-            
-            boolean success = responseService.sendOrderModifyConfirmation(sessionKey, clOrdId, execType, ordStatus);
-            
+
+            boolean success = responseService.sendOrderModifyConfirmationWithDerivedSession(clOrdId, execType, ordStatus);
+
             if (success) {
                 return ResponseEntity.ok().body("Order modify confirmation sent successfully");
             } else {
@@ -185,17 +180,16 @@ public class ResponseController {
             return ResponseEntity.status(500).body("Error sending order modify confirmation: " + e.getMessage());
         }
     }
-    
+
     /**
-     * 发送订单取消确认
+     * 发送订单取消确认（V1.0.1: 从报文数据中推导sessionKey）
      */
     @PostMapping("/execution-report/cancel")
     public ResponseEntity<?> sendOrderCancelConfirmation(
-            @RequestParam String sessionKey,
             @RequestParam String clOrdId,
             @RequestParam String execType,
             @RequestParam String ordStatus) {
-        
+
         try {
             // 验证必需参数
             if (execType == null || execType.isEmpty()) {
@@ -204,9 +198,9 @@ public class ResponseController {
             if (ordStatus == null || ordStatus.isEmpty()) {
                 return ResponseEntity.badRequest().body("Parameter 'ordStatus' is required");
             }
-            
-            boolean success = responseService.sendOrderCancelConfirmation(sessionKey, clOrdId, execType, ordStatus);
-            
+
+            boolean success = responseService.sendOrderCancelConfirmationWithDerivedSession(clOrdId, execType, ordStatus);
+
             if (success) {
                 return ResponseEntity.ok().body("Order cancel confirmation sent successfully");
             } else {

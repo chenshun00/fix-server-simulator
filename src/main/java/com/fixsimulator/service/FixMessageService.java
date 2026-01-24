@@ -15,6 +15,8 @@ import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -116,39 +118,119 @@ public class FixMessageService {
     public List<FixMessageEntity> getMessagesBySessionKey(String sessionKey) {
         return fixMessageRepository.findBySessionKey(sessionKey);
     }
-    
+
     /**
      * 根据消息方向获取消息
      */
     public List<FixMessageEntity> getMessagesByDirection(FixMessageEntity.MessageDirection direction) {
         return fixMessageRepository.findByDirection(direction);
     }
-    
+
     /**
      * 根据消息类型获取消息
      */
     public List<FixMessageEntity> getMessagesByMsgType(String msgType) {
         return fixMessageRepository.findByMsgType(msgType);
     }
-    
+
     /**
      * 根据时间范围获取消息
      */
     public List<FixMessageEntity> getMessagesByTimeRange(LocalDateTime startTime, LocalDateTime endTime) {
         return fixMessageRepository.findByReceiveTimeBetween(startTime, endTime);
     }
-    
+
+    /**
+     * 根据ClOrdId查询消息（V1.0.1: 支持可选查询）
+     */
+    public List<FixMessageEntity> getMessagesByClOrdId(String clOrdId) {
+        if (clOrdId != null && !clOrdId.isEmpty()) {
+            return parsedFieldRepository.findByClOrdId(clOrdId).stream()
+                    .map(field -> getMessageById(field.getMessageId()))
+                    .filter(Optional::isPresent)
+                    .map(Optional::get)
+                    .collect(Collectors.toList());
+        } else {
+            // 如果ClOrdId为空，查询最近一天的数据
+            LocalDateTime oneDayAgo = LocalDateTime.now().minusDays(1);
+            return fixMessageRepository.findByReceiveTimeAfter(oneDayAgo);
+        }
+    }
+
+    /**
+     * 根据Symbol查询消息（V1.0.1: 支持可选查询）
+     */
+    public List<FixMessageEntity> getMessagesBySymbol(String symbol) {
+        if (symbol != null && !symbol.isEmpty()) {
+            return parsedFieldRepository.findBySymbol(symbol).stream()
+                    .map(field -> getMessageById(field.getMessageId()))
+                    .filter(Optional::isPresent)
+                    .map(Optional::get)
+                    .collect(Collectors.toList());
+        } else {
+            // 如果Symbol为空，查询最近一天的数据
+            LocalDateTime oneDayAgo = LocalDateTime.now().minusDays(1);
+            return fixMessageRepository.findByReceiveTimeAfter(oneDayAgo);
+        }
+    }
+
+    /**
+     * 根据ClOrdId和Symbol查询消息（支持可选参数组合）
+     */
+    public List<FixMessageEntity> getMessagesByClOrdIdAndSymbol(String clOrdId, String symbol) {
+        List<FixMessageEntity> result = new ArrayList<>();
+
+        if ((clOrdId == null || clOrdId.isEmpty()) && (symbol == null || symbol.isEmpty())) {
+            // 两者都为空，查询最近一天的数据
+            LocalDateTime oneDayAgo = LocalDateTime.now().minusDays(1);
+            return fixMessageRepository.findByReceiveTimeAfter(oneDayAgo);
+        }
+
+        if (clOrdId != null && !clOrdId.isEmpty()) {
+            result.addAll(parsedFieldRepository.findByClOrdId(clOrdId).stream()
+                    .map(field -> getMessageById(field.getMessageId()))
+                    .filter(Optional::isPresent)
+                    .map(Optional::get)
+                    .collect(Collectors.toList()));
+        }
+
+        if (symbol != null && !symbol.isEmpty()) {
+            List<FixMessageEntity> symbolResults = parsedFieldRepository.findBySymbol(symbol).stream()
+                    .map(field -> getMessageById(field.getMessageId()))
+                    .filter(Optional::isPresent)
+                    .map(Optional::get)
+                    .collect(Collectors.toList());
+
+            if (!result.isEmpty()) {
+                // 如果已有ClOrdId结果，取交集
+                result.retainAll(symbolResults);
+            } else {
+                result.addAll(symbolResults);
+            }
+        }
+
+        return result;
+    }
+
     /**
      * 获取所有消息
      */
     public List<FixMessageEntity> getAllMessages() {
         return fixMessageRepository.findAll();
     }
-    
+
     /**
      * 根据ID获取特定消息
      */
     public Optional<FixMessageEntity> getMessageById(Long id) {
         return fixMessageRepository.findById(id);
+    }
+
+    /**
+     * 获取最近一天的消息（V1.0.1: 支持可选查询）
+     */
+    public List<FixMessageEntity> getRecentMessages() {
+        LocalDateTime oneDayAgo = LocalDateTime.now().minusDays(1);
+        return fixMessageRepository.findByReceiveTimeAfter(oneDayAgo);
     }
 }

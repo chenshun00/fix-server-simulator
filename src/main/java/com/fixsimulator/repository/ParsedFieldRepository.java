@@ -25,6 +25,9 @@ public interface ParsedFieldRepository extends JpaRepository<ParsedFieldEntity, 
     
     // 根据创建时间范围查找
     List<ParsedFieldEntity> findByCreatedAtBetween(java.time.LocalDateTime startTime, java.time.LocalDateTime endTime);
+
+    // 根据创建时间之后的数据查找
+    List<ParsedFieldEntity> findByCreatedAtAfter(java.time.LocalDateTime dateTime);
     
     // 自定义查询：按ClOrdId和Symbol查找
     @Query("SELECT p FROM ParsedFieldEntity p WHERE p.clOrdId = :clOrdId OR p.symbol = :symbol")

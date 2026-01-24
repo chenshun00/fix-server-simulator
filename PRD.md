@@ -133,6 +133,7 @@ FIX Server Simulator 是一个 **FIX Acceptor（服务端）模拟系统**，
 * 按  ClOrdId 查询, ClOrdID 查询为精确匹配，区分大小写，基于原始 FIX 报文字段。
 * 按 Symbol 查询
 * 这一期只需要支持按ClOrdID和Symbol查询
+* V1.0.1: ClOrdId和Symbol查询条件变为可选，如果不填则查询最近一天的数据
 
 ---
 
@@ -265,6 +266,37 @@ FIX Server Simulator 是一个 **FIX Acceptor（服务端）模拟系统**，
 ---
 
 > **本 PRD 冻结后，后续设计与实现不得引入超出本文档定义范围的功能。**
+
+## 版本 1.0.1 更新内容
+
+### 需求背景
+目前查询报文时, ClOrdId或者Symbol是必填的，调整为非必填
+- 不填，查询最近一天的数据
+- 填了，查询对应的数据
+回报时不再需要输入sessionKey，数据本身包含了，应该由数据推导出来
+
+### 核心变更
+
+#### 4.2.3 查询能力 (V1.0.1更新)
+* 支持分页
+* 按  ClOrdId 查询, ClOrdID 查询为精确匹配，区分大小写，基于原始 FIX 报文字段。
+* 按 Symbol 查询
+* 这一期只需要支持按ClOrdID和Symbol查询
+* V1.0.1: ClOrdId和Symbol查询条件变为可选，如果不填则查询最近一天的数据
+
+#### 4.3.4 人工触发响应 (V1.0.1更新)
+* 人工回报 **必须基于已接收的报文生成**
+  * 已报(New)
+  * 部分成交： lastQty，CumQty，leaveQty，ExecType，ordStatus需要web输入，如果用户未输入，http接口拒绝并提示参数xx不完整
+  * 完全成交： lastQty，CumQty，leaveQty，ExecType，ordStatus需要web输入，如果用户未输入，http接口拒绝并提示参数xx不完整
+  * 改单、撤单拒绝：ordStatus，ExecType需要web输入，如果用户未输入，http接口拒绝并提示参数xx不完整
+  * 改单、撤单确认：ordStatus，ExecType需要web输入，如果用户未输入，http接口拒绝并提示参数xx不完整
+* lastQty、CumQty、leaveQty之间的数据中正确性由用户保证，系统不进行校验
+* Web 不提供完全自由的 FIX 报文编辑能力
+* 可选择回报类型：
+  * ExecutionReport
+  * Reject
+* V1.0.1: 回报时不再需要输入sessionKey，系统从报文数据中推导出sessionKey
 
 ## 重点
 * 暂时不进入代码开发
