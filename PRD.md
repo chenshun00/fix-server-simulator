@@ -303,3 +303,74 @@ FIX Server Simulator 是一个 **FIX Acceptor（服务端）模拟系统**，
 * 是否还存在有歧义的地方，如果有需要明确指出
 * 如果没有任何歧义，开始进入数据库和实体设计
 
+## 版本 1.0.5 更新内容
+
+### 需求背景
+目前系统只能手动进行回报，需要支持自动回报功能，以提高模拟器的自动化程度和实用性。
+
+### 核心变更
+
+#### 4.4.2 行为边界 (V1.0.5更新)
+* 模拟规则 **仅影响业务回报**
+* 不影响 Session 心跳、SeqNum、连接状态
+* 新增自动回报功能，根据委托数量自动触发回报序列
+
+#### 4.4.1 支持的模拟行为 (V1.0.5更新)
+* 已报（New报文）
+* 成功回报（部分成交 / 完全成交）
+* 拒单回报（业务拒绝）
+* 不回报（模拟业务异常）
+* **新增：自动回报（基于委托数量）**
+
+#### 4.4.3 自动回报策略 (V1.0.5新增)
+* 自动回报只对New Order单据进行自动回报
+* 根据OrderQty(38)字段的值来决定回报策略
+* 委托数量100：回复已报（NEW）报文 (ExecType=0, OrdStatus=0)
+* 委托数量200：回复已报（NEW）报文 + 部成100股报文 (ExecType=1, OrdStatus=1, LastShares=100, CumQty=100, LeavesQty=100)
+* 委托数量300：回复已报（NEW）报文 + 部成100股报文 + 部成200股报文 + 全成300股报文
+  - NEW报文: ExecType=0, OrdStatus=0
+  - 部成报文1: ExecType=1, OrdStatus=1, LastShares=100, CumQty=100, LeavesQty=200
+  - 部成报文2: ExecType=1, OrdStatus=1, LastShares=100, CumQty=200, LeavesQty=100
+  - 全成报文: ExecType=2, OrdStatus=2, CumQty=300, LeavesQty=0
+* 委托数量400：回复拒绝报文 (ExecType=8, OrdStatus=8, Text="rejected by simulator, don't worry")
+* 其他委托数量：不需要自动回报
+
+#### 5.3 可扩展性 (V1.0.5更新)
+* 规则配置可扩展, 支持后期按照OrderQty进行回报，该能力不要求在本期实现，仅作为未来扩展方向。
+* **V1.0.5: 已实现按照OrderQty进行自动回报的基础能力**
+
+#### 7. 验收标准 (V1.0.5更新)
+* Gateway 能成功建立 FIX Session
+* 所有接收的报文均可落库并展示
+* 人工触发的回报可被 Gateway 正确接收
+* Session 管理行为符合 FIX 协议
+* 模拟行为（成功 / 拒绝 / 延迟 / 不回报）可用
+* 模拟行为仅作用于业务类报文（如 NewOrderSingle），不影响 Session 报文。
+* **V1.0.5新增：支持按委托数量的自动回报，参考4.4.3自动回报策略**
+
+#### 8. 开发阶段划分 (V1.0.5更新)
+### Phase 1：FIX Server 基础能力
+
+* FIX Acceptor 可连接
+* 原始报文落库
+
+### Phase 2：Web 只读展示
+
+* Session / 报文查询
+
+### Phase 3：人工回报能力
+
+* 基于报文生成回报
+* 人工回报时，如果session不存在，那么系统需要提示session已断开链接
+* 回报报文必须通过原 Session 发送，Sender/Target 方向反转
+
+### Phase 4：规则化模拟
+
+* 延迟 / 异常模拟
+
+### Phase 5：自动回报能力 (V1.0.5新增)
+
+* 根据委托数量自动触发回报序列
+* 支持多种回报策略（NEW、部成、全成、拒绝）
+* 保持与手动回报功能的兼容性
+
