@@ -9,6 +9,7 @@ app.controller('MessageQueryController', ['$scope', 'MessageService', 'ReplyServ
     $scope.totalPages = 1;
     $scope.pageSize = 10;
     $scope.selectedMessage = null;
+    $scope.showReplyModal = false; // 控制模态框显示/隐藏
     $scope.replyData = {
         replyType: 'new',
         execType: '0',
@@ -72,7 +73,7 @@ app.controller('MessageQueryController', ['$scope', 'MessageService', 'ReplyServ
     // 打开回报模态框
     $scope.openReplyModal = function(message) {
         $scope.selectedMessage = message;
-        
+
         // 重置回复数据
         $scope.replyData = {
             replyType: 'new',
@@ -83,11 +84,9 @@ app.controller('MessageQueryController', ['$scope', 'MessageService', 'ReplyServ
             leavesQty: 0,
             rejectText: ''
         };
-        
+
         // 显示模态框
-        const modalElement = document.getElementById('replyModal');
-        const modal = new bootstrap.Modal(modalElement);
-        modal.show();
+        $scope.showReplyModal = true;
     };
     
     // 发送回报
@@ -158,17 +157,18 @@ app.controller('MessageQueryController', ['$scope', 'MessageService', 'ReplyServ
         replyPromise.then(function(response) {
             alert('回报发送成功');
             // 关闭模态框
-            const modalElement = document.getElementById('replyModal');
-            const modal = bootstrap.Modal.getInstance(modalElement);
-            if(modal) {
-                modal.hide();
-            }
+            $scope.showReplyModal = false;
         }).catch(function(error) {
             console.error('回报发送失败:', error);
             alert('回报发送失败: ' + (error.data || error.message || '未知错误'));
         });
     };
-    
+
+    // 关闭回报模态框
+    $scope.closeReplyModal = function() {
+        $scope.showReplyModal = false;
+    };
+
     // 初始加载
     loadMessages();
 }]);

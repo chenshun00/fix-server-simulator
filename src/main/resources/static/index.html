@@ -87,21 +87,25 @@
                                     <tr>
                                         <th>ID</th>
                                         <th>ClOrdId</th>
+                                        <th>OrigClOrdId</th>
                                         <th>Symbol</th>
-                                        <th>MsgType</th>
-                                        <th>Direction</th>
+                                        <th>OrderQty</th>
+                                        <th>Price</th>
+                                        <th>Side</th>
                                         <th>Receive Time</th>
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr ng-repeat="message in messages">
-                                        <td>{{ message.id }}</td>
+                                        <td>{{ message.parsedField.messageId }}</td>
                                         <td>{{ message.parsedField.clOrdId }}</td>
+                                        <td>{{ message.parsedField.origClOrdId }}</td>
                                         <td>{{ message.parsedField.symbol }}</td>
-                                        <td>{{ message.msgType }}</td>
-                                        <td>{{ message.direction }}</td>
-                                        <td>{{ message.receiveTime | date:'yyyy-MM-dd HH:mm:ss' }}</td>
+                                        <td>{{ message.parsedField.orderQty }}</td>
+                                        <td>{{ message.parsedField.price }}</td>
+                                        <td>{{ message.parsedField.side == '1' ? '买' : message.parsedField.side == '2' ? '卖' : message.parsedField.side }}</td>
+                                        <td>{{ message.parsedField.createdAt | date:'yyyy-MM-dd HH:mm:ss' }}</td>
                                         <td>
                                             <button class="btn btn-sm btn-outline-primary" ng-click="openReplyModal(message)">回报</button>
                                         </td>
@@ -124,82 +128,83 @@
                                 </li>
                             </ul>
                         </nav>
+
+                        <!-- Reply Modal - Inside message-query view to maintain scope -->
+                        <div ng-if="showReplyModal" class="modal fade show d-block" style="background-color: rgba(0,0,0,0.5);">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="replyModalLabel">回报操作</h5>
+                                        <button type="button" class="btn-close" ng-click="closeReplyModal()"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form>
+                                            <div class="mb-3">
+                                                <label class="form-label">回报类型</label>
+                                                <select class="form-select" ng-model="replyData.replyType">
+                                                    <option value="new">已报 (New)</option>
+                                                    <option value="partial-fill">部分成交</option>
+                                                    <option value="fill">完全成交</option>
+                                                    <option value="reject">拒绝</option>
+                                                    <option value="modify">改单确认</option>
+                                                    <option value="cancel">撤单确认</option>
+                                                </select>
+                                            </div>
+                                            <div class="mb-3" ng-show="replyData.replyType !== 'new' && replyData.replyType !== 'reject'">
+                                                <label class="form-label">ExecType</label>
+                                                <select class="form-select" ng-model="replyData.execType">
+                                                    <option value="0">New (0)</option>
+                                                    <option value="1">Partially Filled (1)</option>
+                                                    <option value="2">Filled (2)</option>
+                                                    <option value="4">Canceled (4)</option>
+                                                    <option value="5">Replaced (5)</option>
+                                                    <option value="8">Rejected (8)</option>
+                                                    <option value="C">Expired (C)</option>
+                                                </select>
+                                            </div>
+                                            <div class="mb-3" ng-show="replyData.replyType !== 'new' && replyData.replyType !== 'reject'">
+                                                <label class="form-label">OrdStatus</label>
+                                                <select class="form-select" ng-model="replyData.ordStatus">
+                                                    <option value="0">New (0)</option>
+                                                    <option value="1">Partially Filled (1)</option>
+                                                    <option value="2">Filled (2)</option>
+                                                    <option value="4">Canceled (4)</option>
+                                                    <option value="5">Replaced (5)</option>
+                                                    <option value="8">Rejected (8)</option>
+                                                    <option value="C">Expired (C)</option>
+                                                </select>
+                                            </div>
+                                            <div class="mb-3" ng-show="replyData.replyType === 'partial-fill' || replyData.replyType === 'fill'">
+                                                <label class="form-label">LastQty</label>
+                                                <input type="number" class="form-control" ng-model="replyData.lastQty">
+                                            </div>
+                                            <div class="mb-3" ng-show="replyData.replyType === 'partial-fill' || replyData.replyType === 'fill'">
+                                                <label class="form-label">CumQty</label>
+                                                <input type="number" class="form-control" ng-model="replyData.cumQty">
+                                            </div>
+                                            <div class="mb-3" ng-show="replyData.replyType === 'partial-fill' || replyData.replyType === 'fill'">
+                                                <label class="form-label">LeavesQty</label>
+                                                <input type="number" class="form-control" ng-model="replyData.leavesQty">
+                                            </div>
+                                            <div class="mb-3" ng-show="replyData.replyType === 'reject'">
+                                                <label class="form-label">Reject Text</label>
+                                                <input type="text" class="form-control" ng-model="replyData.rejectText">
+                                            </div>
+                                        </form>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" ng-click="closeReplyModal()">取消</button>
+                                        <button type="button" class="btn btn-primary" ng-click="sendReply()">发送回报</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </main>
         </div>
     </div>
 
-    <!-- Reply Modal -->
-    <div class="modal fade" id="replyModal" tabindex="-1" aria-labelledby="replyModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="replyModalLabel">回报操作</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form>
-                        <div class="mb-3">
-                            <label class="form-label">回报类型</label>
-                            <select class="form-select" ng-model="replyData.replyType">
-                                <option value="new">已报 (New)</option>
-                                <option value="partial-fill">部分成交</option>
-                                <option value="fill">完全成交</option>
-                                <option value="reject">拒绝</option>
-                                <option value="modify">改单确认</option>
-                                <option value="cancel">撤单确认</option>
-                            </select>
-                        </div>
-                        <div class="mb-3" ng-show="replyData.replyType !== 'new' && replyData.replyType !== 'reject'">
-                            <label class="form-label">ExecType</label>
-                            <select class="form-select" ng-model="replyData.execType">
-                                <option value="0">New (0)</option>
-                                <option value="1">Partially Filled (1)</option>
-                                <option value="2">Filled (2)</option>
-                                <option value="4">Canceled (4)</option>
-                                <option value="5">Replaced (5)</option>
-                                <option value="8">Rejected (8)</option>
-                                <option value="C">Expired (C)</option>
-                            </select>
-                        </div>
-                        <div class="mb-3" ng-show="replyData.replyType !== 'new' && replyData.replyType !== 'reject'">
-                            <label class="form-label">OrdStatus</label>
-                            <select class="form-select" ng-model="replyData.ordStatus">
-                                <option value="0">New (0)</option>
-                                <option value="1">Partially Filled (1)</option>
-                                <option value="2">Filled (2)</option>
-                                <option value="4">Canceled (4)</option>
-                                <option value="5">Replaced (5)</option>
-                                <option value="8">Rejected (8)</option>
-                                <option value="C">Expired (C)</option>
-                            </select>
-                        </div>
-                        <div class="mb-3" ng-show="replyData.replyType === 'partial-fill' || replyData.replyType === 'fill'">
-                            <label class="form-label">LastQty</label>
-                            <input type="number" class="form-control" ng-model="replyData.lastQty">
-                        </div>
-                        <div class="mb-3" ng-show="replyData.replyType === 'partial-fill' || replyData.replyType === 'fill'">
-                            <label class="form-label">CumQty</label>
-                            <input type="number" class="form-control" ng-model="replyData.cumQty">
-                        </div>
-                        <div class="mb-3" ng-show="replyData.replyType === 'partial-fill' || replyData.replyType === 'fill'">
-                            <label class="form-label">LeavesQty</label>
-                            <input type="number" class="form-control" ng-model="replyData.leavesQty">
-                        </div>
-                        <div class="mb-3" ng-show="replyData.replyType === 'reject'">
-                            <label class="form-label">Reject Text</label>
-                            <input type="text" class="form-control" ng-model="replyData.rejectText">
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-                    <button type="button" class="btn btn-primary" ng-click="sendReply()">发送回报</button>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <!-- Bootstrap JS Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

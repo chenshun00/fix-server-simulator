@@ -122,6 +122,7 @@ public class ResponseService {
         executionReport.set(new ExecID(generateExecId())); // 生成执行ID
         executionReport.set(new ExecType(execType.charAt(0))); // 执行类型
         executionReport.set(new OrdStatus(ordStatus.charAt(0))); // 订单状态
+        executionReport.set(new ExecTransType(ExecTransType.NEW)); // 交易类型设为NEW
         if (originalOrder != null && originalOrder.getSymbol() != null) {
             executionReport.set(new Symbol(originalOrder.getSymbol())); // 使用原始订单的证券代码
         } else {
@@ -132,9 +133,22 @@ public class ResponseService {
         } else {
             executionReport.set(new Side(Side.BUY)); // 默认买入
         }
+
+        // 为部成和成交报文设置AvgPx字段
+        double avgPxValue = 123.0; // 默认值
+        if (originalOrder != null && originalOrder.getPrice() != null) {
+            avgPxValue = originalOrder.getPrice().doubleValue(); // 使用原始订单的价格
+        }
+
+        // 根据执行类型决定是否设置平均价格
+        if (execType.equals(ExecType.PARTIAL_FILL) || execType.equals(ExecType.FILL)) {
+            executionReport.set(new AvgPx(avgPxValue)); // 平均价格
+        } else {
+            executionReport.set(new AvgPx(BigDecimal.ZERO.doubleValue())); // 其他类型保持0
+        }
+
         executionReport.set(new LeavesQty(leavesQty != null ? leavesQty.doubleValue() : 0.0)); // 剩余数量
         executionReport.set(new CumQty(cumQty != null ? cumQty.doubleValue() : 0.0)); // 累计成交量
-        executionReport.set(new AvgPx(BigDecimal.ZERO.doubleValue())); // 平均价格
 
         // 如果提供了最后成交量，则设置
         if (lastQty != null) {
@@ -239,6 +253,7 @@ public class ResponseService {
         executionReport.set(new ExecID(generateExecId())); // 生成执行ID
         executionReport.set(new ExecType(ExecType.NEW)); // NEW执行类型
         executionReport.set(new OrdStatus(OrdStatus.NEW)); // NEW订单状态
+        executionReport.set(new ExecTransType(ExecTransType.NEW)); // 交易类型设为NEW
         if (originalOrder != null && originalOrder.getSymbol() != null) {
             executionReport.set(new Symbol(originalOrder.getSymbol())); // 使用原始订单的证券代码
         } else {
@@ -283,6 +298,7 @@ public class ResponseService {
         executionReport.set(new ExecID(generateExecId())); // 生成执行ID
         executionReport.set(new ExecType(ExecType.NEW)); // NEW执行类型
         executionReport.set(new OrdStatus(OrdStatus.NEW)); // NEW订单状态
+        executionReport.set(new ExecTransType(ExecTransType.NEW)); // 交易类型设为NEW
         if (originalOrder != null && originalOrder.getSymbol() != null) {
             executionReport.set(new Symbol(originalOrder.getSymbol())); // 使用原始订单的证券代码
         } else {

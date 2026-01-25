@@ -5,8 +5,8 @@ app.service('ReplyService', ['$http', function($http) {
     service.sendNewOrderAck = function(clOrdId) {
         const params = new URLSearchParams();
         params.append('clOrdId', clOrdId);
-        
-        return $http.post('/api/response/execution-report/new', params, {
+
+        return $http.post('/api/responses/execution-report/new', params, {
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
             }
@@ -21,8 +21,8 @@ app.service('ReplyService', ['$http', function($http) {
         params.append('lastQty', data.lastQty);
         params.append('cumQty', data.cumQty);
         params.append('leavesQty', data.leavesQty);
-        
-        return $http.post('/api/response/execution-report/partial-fill', params, {
+
+        return $http.post('/api/responses/execution-report/partial-fill', params, {
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
             }
@@ -37,8 +37,8 @@ app.service('ReplyService', ['$http', function($http) {
         params.append('lastQty', data.lastQty);
         params.append('cumQty', data.cumQty);
         params.append('leavesQty', data.leavesQty);
-        
-        return $http.post('/api/response/execution-report/fill', params, {
+
+        return $http.post('/api/responses/execution-report/fill', params, {
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
             }
@@ -51,8 +51,8 @@ app.service('ReplyService', ['$http', function($http) {
         if(data.text) {
             params.append('text', data.text);
         }
-        
-        return $http.post('/api/response/reject', params, {
+
+        return $http.post('/api/responses/reject', params, {
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
             }
@@ -64,8 +64,8 @@ app.service('ReplyService', ['$http', function($http) {
         params.append('clOrdId', data.clOrdId);
         params.append('execType', data.execType);
         params.append('ordStatus', data.ordStatus);
-        
-        return $http.post('/api/response/execution-report/modify', params, {
+
+        return $http.post('/api/responses/execution-report/modify', params, {
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
             }
@@ -77,8 +77,8 @@ app.service('ReplyService', ['$http', function($http) {
         params.append('clOrdId', data.clOrdId);
         params.append('execType', data.execType);
         params.append('ordStatus', data.ordStatus);
-        
-        return $http.post('/api/response/execution-report/cancel', params, {
+
+        return $http.post('/api/responses/execution-report/cancel', params, {
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
             }

@@ -25,7 +25,10 @@ public interface FixMessageRepository extends JpaRepository<FixMessageEntity, Lo
 
     // 根据接收时间之后的数据查找
     List<FixMessageEntity> findByReceiveTimeAfter(java.time.LocalDateTime dateTime);
-    
+
+    // 根据接收时间和方向查找
+    List<FixMessageEntity> findByReceiveTimeAfterAndDirection(java.time.LocalDateTime dateTime, FixMessageEntity.MessageDirection direction);
+
     // 自定义查询：按会话和消息类型查找
     @Query("SELECT f FROM FixMessageEntity f WHERE f.sessionKey = :sessionKey AND f.msgType = :msgType")
     List<FixMessageEntity> findBySessionKeyAndMsgType(@Param("sessionKey") String sessionKey, @Param("msgType") String msgType);

@@ -1,6 +1,7 @@
 package com.fixsimulator.service;
 
 import com.fixsimulator.entity.FixMessageEntity;
+import com.fixsimulator.entity.MessageWithParsedField;
 import com.fixsimulator.entity.ParsedFieldEntity;
 import com.fixsimulator.repository.FixMessageRepository;
 import com.fixsimulator.repository.ParsedFieldRepository;
@@ -11,28 +12,43 @@ import quickfix.FieldNotFound;
 import quickfix.Message;
 import quickfix.field.*;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 import java.util.Optional;
 import java.util.ArrayList;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
 @Transactional
 public class FixMessageService {
-    
+
+    @PersistenceContext
+    private EntityManager entityManager;
+
     @Autowired
     private FixMessageRepository fixMessageRepository;
-    
+
     @Autowired
     private ParsedFieldRepository parsedFieldRepository;
-    
+
     /**
-     * 保存原始FIX消息到数据库
+     * 保存原始FIX消息到数据库 - 只保存INBOUND消息
      */
     public FixMessageEntity saveFixMessage(String sessionKey, Message message, FixMessageEntity.MessageDirection direction) {
         try {
+            // 只保存INBOUND消息，忽略OUTBOUND消息
+            if (!FixMessageEntity.MessageDirection.INBOUND.equals(direction)) {
+                return null; // 不保存OUTBOUND消息
+            }
+
             FixMessageEntity entity = new FixMessageEntity();
             entity.setSessionKey(sessionKey);
             entity.setMsgSeqNum(message.getHeader().getInt(MsgSeqNum.FIELD));
@@ -40,18 +56,18 @@ public class FixMessageService {
             entity.setRawMessage(message.toString());
             entity.setReceiveTime(LocalDateTime.now());
             entity.setDirection(direction);
-            
+
             FixMessageEntity savedEntity = fixMessageRepository.save(entity);
-            
+
             // 解析并保存字段
             parseAndSaveFields(savedEntity.getId(), message);
-            
+
             return savedEntity;
         } catch (Exception e) {
             throw new RuntimeException("Error saving FIX message", e);
         }
     }
-    
+
     /**
      * 解析FIX消息并保存到解析字段表
      */
@@ -59,178 +75,121 @@ public class FixMessageService {
         try {
             ParsedFieldEntity parsedField = new ParsedFieldEntity();
             parsedField.setMessageId(messageId);
-            
+
             // 解析消息类型
             if (message.getHeader().isSetField(MsgType.FIELD)) {
                 parsedField.setMsgType(message.getHeader().getString(MsgType.FIELD));
             }
-            
+
             // 解析ClOrdID
             if (message.isSetField(ClOrdID.FIELD)) {
                 parsedField.setClOrdId(message.getString(ClOrdID.FIELD));
             }
-            
+
             // 解析OrigClOrdID
             if (message.isSetField(OrigClOrdID.FIELD)) {
                 parsedField.setOrigClOrdId(message.getString(OrigClOrdID.FIELD));
             }
-            
+
             // 解析Symbol
             if (message.isSetField(Symbol.FIELD)) {
                 parsedField.setSymbol(message.getString(Symbol.FIELD));
             }
-            
+
             // 解析OrderQty
             if (message.isSetField(OrderQty.FIELD)) {
                 parsedField.setOrderQty(new java.math.BigDecimal(message.getString(OrderQty.FIELD)));
             }
-            
+
             // 解析Price
             if (message.isSetField(Price.FIELD)) {
                 parsedField.setPrice(new java.math.BigDecimal(message.getString(Price.FIELD)));
             }
-            
+
             // 解析Side
             if (message.isSetField(Side.FIELD)) {
                 parsedField.setSide(message.getString(Side.FIELD));
             }
-            
+
             // 解析SenderCompID
             if (message.getHeader().isSetField(SenderCompID.FIELD)) {
                 parsedField.setSenderCompId(message.getHeader().getString(SenderCompID.FIELD));
             }
-            
+
             // 解析TargetCompID
             if (message.getHeader().isSetField(TargetCompID.FIELD)) {
                 parsedField.setTargetCompId(message.getHeader().getString(TargetCompID.FIELD));
             }
-            
+
             parsedFieldRepository.save(parsedField);
         } catch (Exception e) {
             // 记录错误但不抛出异常，因为解析失败不应影响原始消息的保存
             System.err.println("Error parsing FIX message fields: " + e.getMessage());
         }
     }
-    
-    /**
-     * 根据会话键获取消息
-     */
-    public List<FixMessageEntity> getMessagesBySessionKey(String sessionKey) {
-        return fixMessageRepository.findBySessionKey(sessionKey);
-    }
 
     /**
-     * 根据消息方向获取消息
+     * 简化的消息查询方法 - 只返回解析字段数据（通过子查询过滤INBOUND消息，避免JOIN）
      */
-    public List<FixMessageEntity> getMessagesByDirection(FixMessageEntity.MessageDirection direction) {
-        return fixMessageRepository.findByDirection(direction);
-    }
+    public List<MessageWithParsedField> queryParsedMessages(QueryCriteria criteria) {
+        // 构建动态JPQL查询 - 使用子查询避免JOIN
+        StringBuilder jpql = new StringBuilder();
+        jpql.append("SELECT p FROM ParsedFieldEntity p ");
+        jpql.append("WHERE p.messageId IN (SELECT f.id FROM FixMessageEntity f WHERE f.direction = :direction) ");
 
-    /**
-     * 根据消息类型获取消息
-     */
-    public List<FixMessageEntity> getMessagesByMsgType(String msgType) {
-        return fixMessageRepository.findByMsgType(msgType);
-    }
+        // 根据参数动态添加查询条件
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("direction", FixMessageEntity.MessageDirection.INBOUND);
 
-    /**
-     * 根据时间范围获取消息
-     */
-    public List<FixMessageEntity> getMessagesByTimeRange(LocalDateTime startTime, LocalDateTime endTime) {
-        return fixMessageRepository.findByReceiveTimeBetween(startTime, endTime);
-    }
-
-    /**
-     * 根据ClOrdId查询消息（V1.0.1: 支持可选查询）
-     */
-    public List<FixMessageEntity> getMessagesByClOrdId(String clOrdId) {
-        if (clOrdId != null && !clOrdId.isEmpty()) {
-            return parsedFieldRepository.findByClOrdId(clOrdId).stream()
-                    .map(field -> getMessageById(field.getMessageId()))
-                    .filter(Optional::isPresent)
-                    .map(Optional::get)
-                    .collect(Collectors.toList());
-        } else {
-            // 如果ClOrdId为空，查询最近一天的数据
-            LocalDateTime oneDayAgo = LocalDateTime.now().minusDays(1);
-            return fixMessageRepository.findByReceiveTimeAfter(oneDayAgo);
-        }
-    }
-
-    /**
-     * 根据Symbol查询消息（V1.0.1: 支持可选查询）
-     */
-    public List<FixMessageEntity> getMessagesBySymbol(String symbol) {
-        if (symbol != null && !symbol.isEmpty()) {
-            return parsedFieldRepository.findBySymbol(symbol).stream()
-                    .map(field -> getMessageById(field.getMessageId()))
-                    .filter(Optional::isPresent)
-                    .map(Optional::get)
-                    .collect(Collectors.toList());
-        } else {
-            // 如果Symbol为空，查询最近一天的数据
-            LocalDateTime oneDayAgo = LocalDateTime.now().minusDays(1);
-            return fixMessageRepository.findByReceiveTimeAfter(oneDayAgo);
-        }
-    }
-
-    /**
-     * 根据ClOrdId和Symbol查询消息（支持可选参数组合）
-     */
-    public List<FixMessageEntity> getMessagesByClOrdIdAndSymbol(String clOrdId, String symbol) {
-        List<FixMessageEntity> result = new ArrayList<>();
-
-        if ((clOrdId == null || clOrdId.isEmpty()) && (symbol == null || symbol.isEmpty())) {
-            // 两者都为空，查询最近一天的数据
-            LocalDateTime oneDayAgo = LocalDateTime.now().minusDays(1);
-            return fixMessageRepository.findByReceiveTimeAfter(oneDayAgo);
+        if (criteria.hasClOrdId()) {
+            jpql.append("AND p.clOrdId = :clOrdId ");
+            parameters.put("clOrdId", criteria.getClOrdId());
         }
 
-        if (clOrdId != null && !clOrdId.isEmpty()) {
-            result.addAll(parsedFieldRepository.findByClOrdId(clOrdId).stream()
-                    .map(field -> getMessageById(field.getMessageId()))
-                    .filter(Optional::isPresent)
-                    .map(Optional::get)
-                    .collect(Collectors.toList()));
+        if (criteria.hasSymbol()) {
+            jpql.append("AND p.symbol = :symbol ");
+            parameters.put("symbol", criteria.getSymbol());
         }
 
-        if (symbol != null && !symbol.isEmpty()) {
-            List<FixMessageEntity> symbolResults = parsedFieldRepository.findBySymbol(symbol).stream()
-                    .map(field -> getMessageById(field.getMessageId()))
-                    .filter(Optional::isPresent)
-                    .map(Optional::get)
-                    .collect(Collectors.toList());
-
-            if (!result.isEmpty()) {
-                // 如果已有ClOrdId结果，取交集
-                result.retainAll(symbolResults);
-            } else {
-                result.addAll(symbolResults);
-            }
+        if (criteria.hasOrigClOrdId()) {
+            jpql.append("AND p.origClOrdId = :origClOrdId ");
+            parameters.put("origClOrdId", criteria.getOrigClOrdId());
         }
 
-        return result;
+        // 添加排序
+        jpql.append("ORDER BY p.createdAt DESC");
+
+        // 执行查询
+        TypedQuery<ParsedFieldEntity> query = entityManager.createQuery(jpql.toString(), ParsedFieldEntity.class);
+
+        // 设置参数
+        for (Map.Entry<String, Object> entry : parameters.entrySet()) {
+            query.setParameter(entry.getKey(), entry.getValue());
+        }
+
+        // 如果需要分页
+        if (criteria.needPagination()) {
+            int offset = criteria.getPage() * criteria.getSize();
+            query.setFirstResult(offset);
+            query.setMaxResults(criteria.getSize());
+        }
+
+        // 处理查询结果
+        List<ParsedFieldEntity> parsedFields = query.getResultList();
+        List<MessageWithParsedField> results = new ArrayList<>();
+
+        for (ParsedFieldEntity parsedField : parsedFields) {
+            results.add(new MessageWithParsedField(null, parsedField));
+        }
+
+        return results;
     }
 
-    /**
-     * 获取所有消息
-     */
-    public List<FixMessageEntity> getAllMessages() {
-        return fixMessageRepository.findAll();
-    }
 
     /**
      * 根据ID获取特定消息
      */
     public Optional<FixMessageEntity> getMessageById(Long id) {
         return fixMessageRepository.findById(id);
-    }
-
-    /**
-     * 获取最近一天的消息（V1.0.1: 支持可选查询）
-     */
-    public List<FixMessageEntity> getRecentMessages() {
-        LocalDateTime oneDayAgo = LocalDateTime.now().minusDays(1);
-        return fixMessageRepository.findByReceiveTimeAfter(oneDayAgo);
     }
 }

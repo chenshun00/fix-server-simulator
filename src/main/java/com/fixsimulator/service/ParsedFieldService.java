@@ -18,12 +18,8 @@ public class ParsedFieldService {
     /**
      * 根据消息ID获取解析字段
      */
-    public ParsedFieldEntity getByMessageId(Long messageId) {
-        List<ParsedFieldEntity> entities = parsedFieldRepository.findByMessageId(messageId);
-        if (entities != null && !entities.isEmpty()) {
-            return entities.get(0); // 返回第一个匹配项
-        }
-        return null;
+    public List<ParsedFieldEntity> getByMessageId(Long messageId) {
+        return parsedFieldRepository.findByMessageId(messageId);
     }
 
     /**

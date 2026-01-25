@@ -70,10 +70,14 @@ public class AutoResponseService {
             quickfix.fix42.ExecutionReport response = new quickfix.fix42.ExecutionReport();
 
             // 设置必需的字段
-            response.setField(new OrderID(originalOrder.getString(OrderID.FIELD)));
+            String orderId = originalOrder.isSetField(OrderID.FIELD) ?
+                originalOrder.getString(OrderID.FIELD) :
+                java.util.UUID.randomUUID().toString();
+            response.setField(new OrderID(orderId));
             response.setField(new ExecID(java.util.UUID.randomUUID().toString()));
             response.setField(new ExecType('0'));  // NEW
             response.setField(new OrdStatus('0')); // NEW
+            response.setField(new ExecTransType('0')); // NEW transaction type
             response.setField(new Symbol(originalOrder.getString(Symbol.FIELD)));
             response.setField(new Side(originalOrder.getChar(Side.FIELD)));
 
@@ -129,10 +133,15 @@ public class AutoResponseService {
             quickfix.fix42.ExecutionReport response = new quickfix.fix42.ExecutionReport();
 
             // 设置必需的字段
-            response.setField(new OrderID(originalOrder.getString(OrderID.FIELD)));
+            String orderId = originalOrder.isSetField(OrderID.FIELD) ?
+                originalOrder.getString(OrderID.FIELD) :
+                java.util.UUID.randomUUID().toString();
+            response.setField(new OrderID(orderId));
             response.setField(new ExecID(java.util.UUID.randomUUID().toString()));
             response.setField(new ExecType('8'));  // REJECTED
             response.setField(new OrdStatus('8')); // REJECTED
+            response.setField(new ExecTransType('0')); // NEW transaction type
+            response.setField(new AvgPx(100.0)); // 平均成交价
             response.setField(new Symbol(originalOrder.getString(Symbol.FIELD)));
             response.setField(new Side(originalOrder.getChar(Side.FIELD)));
 
@@ -160,10 +169,14 @@ public class AutoResponseService {
         quickfix.fix42.ExecutionReport response = new quickfix.fix42.ExecutionReport();
 
         // 设置必需的字段
-        response.setField(new OrderID(originalOrder.getString(OrderID.FIELD)));
+        String orderId = originalOrder.isSetField(OrderID.FIELD) ?
+            originalOrder.getString(OrderID.FIELD) :
+            java.util.UUID.randomUUID().toString();
+        response.setField(new OrderID(orderId));
         response.setField(new ExecID(java.util.UUID.randomUUID().toString()));
         response.setField(new ExecType('0'));  // NEW
         response.setField(new OrdStatus('0')); // NEW
+        response.setField(new ExecTransType('0')); // NEW transaction type
         response.setField(new Symbol(originalOrder.getString(Symbol.FIELD)));
         response.setField(new Side(originalOrder.getChar(Side.FIELD)));
 
@@ -178,10 +191,15 @@ public class AutoResponseService {
         quickfix.fix42.ExecutionReport response = new quickfix.fix42.ExecutionReport();
 
         // 设置必需的字段
-        response.setField(new OrderID(originalOrder.getString(OrderID.FIELD)));
+        String orderId = originalOrder.isSetField(OrderID.FIELD) ?
+            originalOrder.getString(OrderID.FIELD) :
+            java.util.UUID.randomUUID().toString();
+        response.setField(new OrderID(orderId));
         response.setField(new ExecID(java.util.UUID.randomUUID().toString()));
         response.setField(new ExecType('1'));  // PARTIAL_FILL
         response.setField(new OrdStatus('1')); // PARTIAL_FILL
+        response.setField(new ExecTransType('0')); // NEW transaction type
+        response.setField(new AvgPx(100.0)); // 平均成交价
         response.setField(new Symbol(originalOrder.getString(Symbol.FIELD)));
         response.setField(new Side(originalOrder.getChar(Side.FIELD)));
 
@@ -201,10 +219,15 @@ public class AutoResponseService {
         quickfix.fix42.ExecutionReport response = new quickfix.fix42.ExecutionReport();
 
         // 设置必需的字段
-        response.setField(new OrderID(originalOrder.getString(OrderID.FIELD)));
+        String orderId = originalOrder.isSetField(OrderID.FIELD) ?
+            originalOrder.getString(OrderID.FIELD) :
+            java.util.UUID.randomUUID().toString();
+        response.setField(new OrderID(orderId));
         response.setField(new ExecID(java.util.UUID.randomUUID().toString()));
         response.setField(new ExecType('2'));  // FILL
         response.setField(new OrdStatus('2')); // FILLED
+        response.setField(new ExecTransType('0')); // NEW transaction type
+        response.setField(new AvgPx(100.0)); // 平均成交价
         response.setField(new Symbol(originalOrder.getString(Symbol.FIELD)));
         response.setField(new Side(originalOrder.getChar(Side.FIELD)));
 

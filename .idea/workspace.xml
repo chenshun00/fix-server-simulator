@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="07bf37fd-e4b6-4b6b-a568-19558b1a12e6" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/fixsimulator/controller/MessageController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/fixsimulator/controller/MessageController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/fixsimulator/repository/FixMessageRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/fixsimulator/repository/FixMessageRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/fixsimulator/service/AutoResponseService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/fixsimulator/service/AutoResponseService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/fixsimulator/service/FixMessageService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/fixsimulator/service/FixMessageService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/fixsimulator/service/ParsedFieldService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/fixsimulator/service/ParsedFieldService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/fixsimulator/service/ResponseService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/fixsimulator/service/ResponseService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/static/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/static/js/controllers/message-query.controller.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/js/controllers/message-query.controller.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/static/js/services/message.service.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/js/services/message.service.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/static/js/services/reply.service.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/js/services/reply.service.js" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitSEFilterConfiguration">
+    <file-type-list>
+      <filtered-out-file-type name="LOCAL_BRANCH" />
+      <filtered-out-file-type name="REMOTE_BRANCH" />
+      <filtered-out-file-type name="TAG" />
+      <filtered-out-file-type name="COMMIT_BY_MESSAGE" />
+    </file-type-list>
+  </component>
+  <component name="ProjectId" id="38hsSAnb2u8BU83c8D36UnDU2ur" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="showLibraryContents" value="true" />
+    <option name="showVisibilityIcons" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="aspect.path.notification.shown" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="project.structure.last.edited" value="Global Libraries" />
+    <property name="project.structure.proportion" value="0.0" />
+    <property name="project.structure.side.proportion" value="0.2" />
+    <property name="settings.editor.selected.configurable" value="preferences.lookFeel" />
+  </component>
+  <component name="RunManager">
+    <configuration name="FixServerSimulatorApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+      <module name="fix-server-simulator" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.fixsimulator.FixServerSimulatorApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="07bf37fd-e4b6-4b6b-a568-19558b1a12e6" name="Default Changelist" comment="" />
+      <created>1769263136086</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1769263136086</updated>
+      <workItem from="1769263139400" duration="44000" />
+      <workItem from="1769263192387" duration="3887000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>
