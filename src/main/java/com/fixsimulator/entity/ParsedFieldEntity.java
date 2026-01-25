@@ -14,7 +14,10 @@ public class ParsedFieldEntity {
     
     @Column(name = "message_id", nullable = false)
     private Long messageId;
-    
+
+    @Column(name = "direction", nullable = false, length = 10)
+    private String direction;
+
     @Column(name = "msg_type")
     private String msgType;
     
@@ -67,7 +70,15 @@ public class ParsedFieldEntity {
     public void setMessageId(Long messageId) {
         this.messageId = messageId;
     }
-    
+
+    public String getDirection() {
+        return direction;
+    }
+
+    public void setDirection(String direction) {
+        this.direction = direction;
+    }
+
     public String getMsgType() {
         return msgType;
     }

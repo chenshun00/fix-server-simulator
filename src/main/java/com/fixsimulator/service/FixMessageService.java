@@ -60,7 +60,7 @@ public class FixMessageService {
             FixMessageEntity savedEntity = fixMessageRepository.save(entity);
 
             // 解析并保存字段
-            parseAndSaveFields(savedEntity.getId(), message);
+            parseAndSaveFields(savedEntity.getId(), message, direction);
 
             return savedEntity;
         } catch (Exception e) {
@@ -71,10 +71,11 @@ public class FixMessageService {
     /**
      * 解析FIX消息并保存到解析字段表
      */
-    private void parseAndSaveFields(Long messageId, Message message) {
+    private void parseAndSaveFields(Long messageId, Message message, FixMessageEntity.MessageDirection direction) {
         try {
             ParsedFieldEntity parsedField = new ParsedFieldEntity();
             parsedField.setMessageId(messageId);
+            parsedField.setDirection(direction.name());
 
             // 解析消息类型
             if (message.getHeader().isSetField(MsgType.FIELD)) {
@@ -129,17 +130,16 @@ public class FixMessageService {
     }
 
     /**
-     * 简化的消息查询方法 - 只返回解析字段数据（通过子查询过滤INBOUND消息，避免JOIN）
+     * 简化的消息查询方法 - 只返回解析字段数据（使用direction字段过滤INBOUND消息）
      */
     public List<MessageWithParsedField> queryParsedMessages(QueryCriteria criteria) {
-        // 构建动态JPQL查询 - 使用子查询避免JOIN
+        // 构建动态JPQL查询 - 使用direction字段直接过滤INBOUND消息
         StringBuilder jpql = new StringBuilder();
         jpql.append("SELECT p FROM ParsedFieldEntity p ");
-        jpql.append("WHERE p.messageId IN (SELECT f.id FROM FixMessageEntity f WHERE f.direction = :direction) ");
+        jpql.append("WHERE p.direction = 'INBOUND' ");
 
         // 根据参数动态添加查询条件
         Map<String, Object> parameters = new HashMap<>();
-        parameters.put("direction", FixMessageEntity.MessageDirection.INBOUND);
 
         if (criteria.hasClOrdId()) {
             jpql.append("AND p.clOrdId = :clOrdId ");
