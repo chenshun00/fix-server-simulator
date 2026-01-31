@@ -1,0 +1,100 @@
+{
+  "rules": [
+    {
+      "id": "100",
+      "name": "委托数量100 - 仅回报已报",
+      "condition": {
+        "field": "OrderQty",
+        "operator": "==",
+        "value": 100
+      },
+      "actions": [
+        {
+          "type": "SEND_REPORT",
+          "execType": "0",
+          "ordStatus": "0",
+          "delayMs": 0
+        }
+      ]
+    },
+    {
+      "id": "200",
+      "name": "委托数量200 - 已报 + 部成100",
+      "condition": {
+        "field": "OrderQty",
+        "operator": "==",
+        "value": 200
+      },
+      "actions": [
+        {
+          "type": "SEND_REPORT",
+          "execType": "0",
+          "ordStatus": "0",
+          "delayMs": 0
+        },
+        {
+          "type": "SEND_REPORT",
+          "execType": "1",
+          "ordStatus": "1",
+          "lastQty": 100,
+          "delayMs": 10
+        }
+      ]
+    },
+    {
+      "id": "300",
+      "name": "委托数量300 - 已报 + 部成100 + 部成200 + 全成",
+      "condition": {
+        "field": "OrderQty",
+        "operator": "==",
+        "value": 300
+      },
+      "actions": [
+        {
+          "type": "SEND_REPORT",
+          "execType": "0",
+          "ordStatus": "0",
+          "delayMs": 0
+        },
+        {
+          "type": "SEND_REPORT",
+          "execType": "1",
+          "ordStatus": "1",
+          "lastQty": 100,
+          "delayMs": 10
+        },
+        {
+          "type": "SEND_REPORT",
+          "execType": "1",
+          "ordStatus": "1",
+          "lastQty": 100,
+          "delayMs": 10
+        },
+        {
+          "type": "SEND_REPORT",
+          "execType": "2",
+          "ordStatus": "2",
+          "delayMs": 10
+        }
+      ]
+    },
+    {
+      "id": "400",
+      "name": "委托数量400 - 拒绝",
+      "condition": {
+        "field": "OrderQty",
+        "operator": "==",
+        "value": 400
+      },
+      "actions": [
+        {
+          "type": "SEND_REPORT",
+          "execType": "8",
+          "ordStatus": "8",
+          "text": "rejected by simulator, don't worry",
+          "delayMs": 0
+        }
+      ]
+    }
+  ]
+}
