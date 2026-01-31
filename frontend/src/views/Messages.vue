@@ -59,6 +59,7 @@
         <table class="terminal-table">
           <thead>
             <tr>
+              <th width="40"></th>
               <th>类型</th>
               <th>股票</th>
               <th>ClOrdID</th>
@@ -72,36 +73,68 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="msg in messageStore.messages" :key="msg.id" class="table-row">
-              <td>
-                <span class="msg-type" :class="`type-${msg.msgType}`">
-                  {{ msg.msgType }}
-                </span>
-              </td>
-              <td class="mono">{{ msg.symbol }}</td>
-              <td class="mono text-truncate">{{ msg.clOrdId || '-' }}</td>
-              <td class="mono text-truncate">{{ msg.origClOrdId || '-' }}</td>
-              <td class="mono">{{ msg.price || '-' }}</td>
-              <td class="mono">{{ msg.orderQty || '-' }}</td>
-              <td>
-                <span class="side-badge" :class="msg.side?.toLowerCase()">
-                  {{ msg.side || '-' }}
-                </span>
-              </td>
-              <td>{{ msg.ordType || '-' }}</td>
-              <td class="timestamp">{{ formatTime(msg.receivedAt) }}</td>
-              <td>
-                <button
-                  @click="openResponseDialog(msg)"
-                  class="action-btn"
-                  title="手动回报"
-                >
-                  回报
-                </button>
-              </td>
-            </tr>
+            <template v-for="msg in messageStore.messages" :key="msg.id">
+              <!-- 主行 -->
+              <tr class="table-row">
+                <td class="expand-cell">
+                  <button
+                    @click="toggleExpand(msg.id)"
+                    class="expand-btn"
+                    :class="{ expanded: expandedRows[msg.id] }"
+                  >
+                    <span class="expand-icon">›</span>
+                  </button>
+                </td>
+                <td>
+                  <span class="msg-type" :class="`type-${msg.msgType}`">
+                    {{ msg.msgType }}
+                  </span>
+                </td>
+                <td class="mono">{{ msg.symbol }}</td>
+                <td class="mono text-truncate">{{ msg.clOrdId || '-' }}</td>
+                <td class="mono text-truncate">{{ msg.origClOrdId || '-' }}</td>
+                <td class="mono">{{ msg.price || '-' }}</td>
+                <td class="mono">{{ msg.orderQty || '-' }}</td>
+                <td>
+                  <span class="side-badge" :class="msg.side?.toLowerCase()">
+                    {{ msg.side || '-' }}
+                  </span>
+                </td>
+                <td>{{ msg.ordType || '-' }}</td>
+                <td class="timestamp">{{ formatTime(msg.receivedAt) }}</td>
+                <td>
+                  <button
+                    @click="openResponseDialog(msg)"
+                    class="action-btn"
+                    title="手动回报"
+                  >
+                    回报
+                  </button>
+                </td>
+              </tr>
+
+              <!-- 展开行：原始报文 -->
+              <tr v-if="expandedRows[msg.id]" class="expanded-row">
+                <td colspan="11" class="expanded-cell-content">
+                  <div class="raw-message-container">
+                    <div class="raw-message-header">
+                      <span class="raw-message-title">原始报文</span>
+                      <button
+                        @click="copyMessage(msg.message)"
+                        class="copy-btn"
+                        title="复制"
+                      >
+                        复制
+                      </button>
+                    </div>
+                    <pre class="raw-message-content">{{ formatMessage(msg.message) }}</pre>
+                  </div>
+                </td>
+              </tr>
+            </template>
+
             <tr v-if="messageStore.messages.length === 0">
-              <td colspan="10" class="empty-cell">
+              <td colspan="11" class="empty-cell">
                 <div class="table-empty">
                   <span class="empty-icon">◇</span>
                   <p>暂无消息记录</p>
@@ -155,6 +188,7 @@ const pagination = reactive({ page: 0, size: 20 })
 
 const dialogVisible = ref(false)
 const selectedMessage = ref<MessageType | null>(null)
+const expandedRows = ref<Record<number, boolean>>({})
 
 const hasNextPage = computed(() =>
   (pagination.page + 1) * pagination.size < messageStore.total
@@ -192,6 +226,24 @@ function formatTime(dateStr: string) {
     second: '2-digit',
     hour12: false
   })
+}
+
+function toggleExpand(id: number) {
+  expandedRows.value[id] = !expandedRows.value[id]
+}
+
+function formatMessage(msg?: string) {
+  if (!msg) return ''
+  // 将 SOH 分符替换为 | 显示
+  return msg.replace(/\u0001/g, ' | ')
+}
+
+function copyMessage(msg?: string) {
+  if (!msg) return
+  navigator.clipboard.writeText(msg)
+    .then(() => {
+      // 可以在这里添加提示
+    })
 }
 
 function openResponseDialog(msg: MessageType) {
@@ -403,6 +455,102 @@ handleSearch()
 
 .table-row:last-child td {
   border-bottom: none;
+}
+
+.expand-cell {
+  padding: 0.5rem 0.5rem 0.5rem 1rem !important;
+}
+
+.expand-btn {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.expand-btn:hover {
+  border-color: var(--accent-blue);
+  background: var(--accent-blue-dim);
+}
+
+.expand-icon {
+  font-size: 1rem;
+  font-weight: bold;
+  color: var(--text-secondary);
+  display: inline-block;
+  transition: transform 0.2s ease;
+}
+
+.expand-btn.expanded .expand-icon {
+  transform: rotate(90deg);
+  color: var(--accent-blue);
+}
+
+/* Expanded Row */
+.expanded-row {
+  background: var(--bg-primary);
+}
+
+.expanded-cell-content {
+  padding: 0;
+}
+
+.raw-message-container {
+  padding: 1rem;
+}
+
+.raw-message-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.raw-message-title {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.copy-btn {
+  padding: 0.375rem 0.75rem;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: var(--font-mono);
+}
+
+.copy-btn:hover {
+  border-color: var(--accent-blue);
+  color: var(--accent-blue);
+}
+
+.raw-message-content {
+  margin: 0;
+  padding: 1rem;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  white-space: pre-wrap;
+  word-break: break-all;
+  line-height: 1.6;
+  overflow-x: auto;
 }
 
 .mono {

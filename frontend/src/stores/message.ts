@@ -14,6 +14,7 @@ export interface Message {
   side?: string
   ordType?: string
   receivedAt: string
+  message?: string
 }
 
 export const useMessageStore = defineStore('message', () => {
