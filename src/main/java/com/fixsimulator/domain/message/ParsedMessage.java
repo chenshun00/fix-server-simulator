@@ -40,11 +40,9 @@ public class ParsedMessage {
     @Column(name = "order_qty", precision = 18, scale = 4)
     private BigDecimal orderQty;
 
-    @Enumerated(EnumType.STRING)
     @Column(name = "side")
     private String side;
 
-    @Enumerated(EnumType.STRING)
     @Column(name = "ord_type")
     private String ordType;
 
