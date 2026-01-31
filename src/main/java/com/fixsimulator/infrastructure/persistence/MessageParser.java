@@ -18,6 +18,9 @@ public class MessageParser {
     }
 
     public ParsedMessage toParsedMessage(FixMessage fixMessage, SessionID sessionId) {
+        // 获取原始 FIX 报文
+        String rawMessage = fixMessage.getOriginalMessage().toString();
+
         return ParsedMessage.builder()
                 .sessionId(sessionId.toString())
                 .msgType(fixMessage.getMsgType())
@@ -28,6 +31,7 @@ public class MessageParser {
                 .orderQty(fixMessage.getOrderQty())
                 .side(fixMessage.getSide() != null ? fixMessage.getSide().getDisplayName() : null)
                 .ordType(fixMessage.getOrdType() != null ? fixMessage.getOrdType().getDisplayName() : null)
+                .message(rawMessage)
                 .build();
     }
 }

@@ -49,6 +49,9 @@ public class ParsedMessage {
     @Column(name = "received_at")
     private LocalDateTime receivedAt;
 
+    @Column(name = "message", length = 2000)
+    private String message;
+
     @PrePersist
     protected void onCreate() {
         receivedAt = LocalDateTime.now();
