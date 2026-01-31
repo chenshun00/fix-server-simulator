@@ -15,7 +15,9 @@
       "Bash(kill:*)",
       "Bash(pkill:*)",
       "Bash(git worktree:*)",
-      "Bash(mvn compile:*)"
+      "Bash(mvn compile:*)",
+      "Skill(frontend-design:frontend-design)",
+      "Skill(superpowers:brainstorming)"
     ]
   }
 }

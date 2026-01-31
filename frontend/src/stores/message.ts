@@ -4,6 +4,7 @@ import api from '../api/client'
 
 export interface Message {
   id: number
+  sessionId: string
   msgType: string
   symbol: string
   clOrdId?: string

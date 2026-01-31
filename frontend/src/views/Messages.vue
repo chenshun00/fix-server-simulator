@@ -68,6 +68,7 @@
               <th>方向</th>
               <th>类型</th>
               <th>时间</th>
+              <th>操作</th>
             </tr>
           </thead>
           <tbody>
@@ -89,9 +90,18 @@
               </td>
               <td>{{ msg.ordType || '-' }}</td>
               <td class="timestamp">{{ formatTime(msg.receivedAt) }}</td>
+              <td>
+                <button
+                  @click="openResponseDialog(msg)"
+                  class="action-btn"
+                  title="手动回报"
+                >
+                  回报
+                </button>
+              </td>
             </tr>
             <tr v-if="messageStore.messages.length === 0">
-              <td colspan="9" class="empty-cell">
+              <td colspan="10" class="empty-cell">
                 <div class="table-empty">
                   <span class="empty-icon">◇</span>
                   <p>暂无消息记录</p>
@@ -123,16 +133,28 @@
         </div>
       </div>
     </div>
+
+    <!-- Response Dialog -->
+    <ResponseDialog
+      v-model:visible="dialogVisible"
+      :message="selectedMessage"
+      @success="handleResponseSuccess"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { reactive, computed } from 'vue'
+import { reactive, ref, computed } from 'vue'
 import { useMessageStore } from '../stores/message'
+import { type Message as MessageType } from '../stores/message'
+import ResponseDialog from '../components/ResponseDialog.vue'
 
 const messageStore = useMessageStore()
 const searchForm = reactive({ symbol: '', clOrdId: '' })
 const pagination = reactive({ page: 0, size: 20 })
+
+const dialogVisible = ref(false)
+const selectedMessage = ref<MessageType | null>(null)
 
 const hasNextPage = computed(() =>
   (pagination.page + 1) * pagination.size < messageStore.total
@@ -170,6 +192,15 @@ function formatTime(dateStr: string) {
     second: '2-digit',
     hour12: false
   })
+}
+
+function openResponseDialog(msg: MessageType) {
+  selectedMessage.value = msg
+  dialogVisible.value = true
+}
+
+function handleResponseSuccess() {
+  // 可以在这里添加刷新逻辑
 }
 
 handleSearch()
@@ -380,7 +411,7 @@ handleSearch()
 }
 
 .text-truncate {
-  max-width: 150px;
+  max-width: 120px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -408,9 +439,9 @@ handleSearch()
 }
 
 .msg-type.type-G {
-  background: rgba(46, 213, 115, 0.1);
-  color: var(--accent-blue);
-  border: 1px solid rgba(46, 213, 115, 0.3);
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--accent-green);
+  border: 1px solid rgba(16, 185, 129, 0.3);
 }
 
 .side-badge {
@@ -438,6 +469,24 @@ handleSearch()
   color: var(--text-muted);
   font-size: 0.75rem;
   font-family: var(--font-mono);
+}
+
+.action-btn {
+  padding: 0.375rem 0.75rem;
+  background: var(--accent-blue-dim);
+  border: 1px solid var(--accent-blue);
+  border-radius: 4px;
+  color: var(--accent-blue);
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: var(--font-mono);
+}
+
+.action-btn:hover {
+  background: rgba(59, 130, 246, 0.2);
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.2);
 }
 
 .empty-cell {

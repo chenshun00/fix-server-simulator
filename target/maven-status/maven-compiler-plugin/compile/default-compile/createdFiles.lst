@@ -6,6 +6,9 @@ com/fixsimulator/domain/autoresponse/Action.class
 com/fixsimulator/interfaces/rest/dto/MessageResponse.class
 com/fixsimulator/interfaces/fix/ExecutionReportGenerator.class
 com/fixsimulator/interfaces/rest/dto/HealthResponse.class
+com/fixsimulator/interfaces/rest/dto/ManualResponseRequest.class
+com/fixsimulator/interfaces/rest/ManualResponseController.class
+com/fixsimulator/application/ManualResponseService.class
 com/fixsimulator/domain/autoresponse/Rule.class
 com/fixsimulator/domain/message/FixMessage.class
 com/fixsimulator/domain/session/SessionStatus.class
@@ -13,6 +16,7 @@ com/fixsimulator/infrastructure/fix/FixMessageApplicationAdapter.class
 com/fixsimulator/interfaces/rest/dto/HealthResponse$HealthResponseBuilder.class
 com/fixsimulator/interfaces/rest/dto/SessionResponse$SessionResponseBuilder.class
 com/fixsimulator/domain/message/MsgType.class
+com/fixsimulator/interfaces/fix/ExecutionReportFactory.class
 com/fixsimulator/infrastructure/fix/FixConfig.class
 com/fixsimulator/infrastructure/fix/SLF4JLog.class
 com/fixsimulator/interfaces/rest/dto/MessageResponse$MessageResponseBuilder.class
@@ -25,12 +29,14 @@ com/fixsimulator/domain/message/Side.class
 com/fixsimulator/domain/message/ParsedMessageRepository.class
 com/fixsimulator/domain/session/Session$SessionBuilder.class
 com/fixsimulator/interfaces/rest/MessageController.class
+com/fixsimulator/interfaces/rest/dto/ApiResponse.class
 com/fixsimulator/domain/message/FixMessageField.class
 com/fixsimulator/interfaces/rest/dto/SessionResponse.class
 com/fixsimulator/infrastructure/persistence/MessageParser.class
 com/fixsimulator/domain/session/Session.class
 com/fixsimulator/infrastructure/fix/SLF4JLogFactory.class
 com/fixsimulator/domain/session/SessionRepository.class
+com/fixsimulator/interfaces/rest/dto/ManualResponseRequest$ManualResponseRequestBuilder.class
 com/fixsimulator/application/AutoResponseOrchestrator.class
 com/fixsimulator/application/SessionApplicationService.class
 com/fixsimulator/domain/message/ParsedMessage$ParsedMessageBuilder.class
