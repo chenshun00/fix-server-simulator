@@ -36,8 +36,13 @@
 
         <!-- QuickFIX/J -->
         <dependency>
-            <groupId>quickfixj</groupId>
+            <groupId>org.quickfixj</groupId>
             <artifactId>quickfixj-core</artifactId>
+            <version>${quickfixj.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.quickfixj</groupId>
+            <artifactId>quickfixj-messages-fix42</artifactId>
             <version>${quickfixj.version}</version>
         </dependency>
 
