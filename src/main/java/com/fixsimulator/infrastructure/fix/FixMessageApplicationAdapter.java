@@ -4,6 +4,9 @@ import com.fixsimulator.application.AutoResponseOrchestrator;
 import com.fixsimulator.domain.message.FixMessage;
 import com.fixsimulator.domain.message.ParsedMessage;
 import com.fixsimulator.domain.message.ParsedMessageRepository;
+import com.fixsimulator.domain.session.Session;
+import com.fixsimulator.domain.session.SessionRepository;
+import com.fixsimulator.domain.session.SessionStatus;
 import com.fixsimulator.infrastructure.persistence.MessageParser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +23,7 @@ public class FixMessageApplicationAdapter implements Application {
     private final MessageParser messageParser;
     private final ParsedMessageRepository messageRepository;
     private final AutoResponseOrchestrator autoResponseOrchestrator;
+    private final SessionRepository sessionRepository;
 
     @Override
     public void onCreate(SessionID sessionId) {
@@ -29,11 +33,31 @@ public class FixMessageApplicationAdapter implements Application {
     @Override
     public void onLogon(SessionID sessionId) {
         log.info("Session logged on: {}", sessionId);
+
+        // 创建或更新会话记录
+        String sessionKey = sessionId.toString();
+        Session session = sessionRepository.findBySessionId(sessionKey)
+                .orElse(Session.builder()
+                        .sessionId(sessionKey)
+                        .senderCompId(sessionId.getSenderCompID())
+                        .targetCompId(sessionId.getTargetCompID())
+                        .build());
+
+        session.setStatus(SessionStatus.CONNECTED);
+        sessionRepository.save(session);
+        log.info("Session saved to database: {}", session);
     }
 
     @Override
     public void onLogout(SessionID sessionId) {
         log.info("Session logged out: {}", sessionId);
+
+        // 更新会话状态为已登出
+        sessionRepository.findBySessionId(sessionId.toString()).ifPresent(session -> {
+            session.setStatus(SessionStatus.LOGGED_OUT);
+            sessionRepository.save(session);
+            log.info("Session status updated to LOGGED_OUT: {}", session.getSessionId());
+        });
     }
 
     @Override
