@@ -1,0 +1,26 @@
+server:
+  port: 8192
+
+spring:
+  application:
+    name: fix-server-simulator
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/fix_simulator?useSSL=false&serverTimezone=UTC&createDatabaseIfNotExist=true
+    username: root
+    password: chenshun
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        format_sql: true
+
+logging:
+  level:
+    com.fixsimulator: DEBUG
+    quickfix: DEBUG

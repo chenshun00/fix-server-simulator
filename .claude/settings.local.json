@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Skill(superpowers:executing-plans)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(mvn clean compile:*)",
+      "Bash(curl:*)",
+      "Bash(mvn clean package:*)",
+      "Bash(ls:*)",
+      "Bash(java -jar:*)",
+      "Bash(lsof:*)",
+      "Bash(npm install)",
+      "Bash(npm run dev)",
+      "Bash(kill:*)",
+      "Bash(pkill:*)"
+    ]
+  }
+}
