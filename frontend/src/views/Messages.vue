@@ -196,7 +196,7 @@ handleSearch()
 }
 
 .title-icon {
-  color: var(--accent-green);
+  color: var(--accent-blue);
   font-size: 1.5rem;
 }
 
@@ -249,8 +249,8 @@ handleSearch()
 
 .terminal-input:focus {
   outline: none;
-  border-color: var(--accent-green);
-  box-shadow: 0 0 0 3px var(--accent-green-dim);
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 0 3px var(--accent-blue-dim);
 }
 
 .terminal-input::placeholder {
@@ -284,14 +284,14 @@ handleSearch()
 }
 
 .terminal-btn.primary {
-  background: var(--accent-green-dim);
-  border-color: var(--accent-green);
-  color: var(--accent-green);
+  background: var(--accent-blue-dim);
+  border-color: var(--accent-blue);
+  color: var(--accent-blue);
 }
 
 .terminal-btn.primary:hover {
-  background: rgba(0, 255, 159, 0.2);
-  box-shadow: 0 0 20px rgba(0, 255, 159, 0.2);
+  background: rgba(59, 130, 246, 0.2);
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.25);
 }
 
 .terminal-btn:disabled {
@@ -396,9 +396,9 @@ handleSearch()
 }
 
 .msg-type.type-D {
-  background: rgba(0, 255, 159, 0.1);
-  color: var(--accent-green);
-  border: 1px solid rgba(0, 255, 159, 0.3);
+  background: rgba(59, 130, 246, 0.1);
+  color: var(--accent-blue);
+  border: 1px solid rgba(59, 130, 246, 0.3);
 }
 
 .msg-type.type-F {
@@ -429,9 +429,9 @@ handleSearch()
 }
 
 .side-badge.sell {
-  background: rgba(46, 213, 115, 0.1);
+  background: rgba(16, 185, 129, 0.1);
   color: var(--accent-green);
-  border: 1px solid rgba(46, 213, 115, 0.3);
+  border: 1px solid rgba(16, 185, 129, 0.3);
 }
 
 .timestamp {
@@ -492,8 +492,8 @@ handleSearch()
 }
 
 .page-btn:hover:not(:disabled) {
-  border-color: var(--accent-green);
-  color: var(--accent-green);
+  border-color: var(--accent-blue);
+  color: var(--accent-blue);
 }
 
 .page-btn:disabled {

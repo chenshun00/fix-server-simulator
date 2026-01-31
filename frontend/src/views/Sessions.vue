@@ -127,7 +127,7 @@ onMounted(() => {
 }
 
 .title-icon {
-  color: var(--accent-green);
+  color: var(--accent-blue);
   font-size: 1.5rem;
 }
 
@@ -163,7 +163,7 @@ onMounted(() => {
 .stat-value {
   font-size: 1.5rem;
   font-weight: 700;
-  color: var(--accent-green);
+  color: var(--accent-blue);
   margin-top: 0.25rem;
 }
 
@@ -183,12 +183,12 @@ onMounted(() => {
 }
 
 .session-card:hover {
-  border-color: var(--accent-green);
-  box-shadow: 0 8px 30px rgba(0, 255, 159, 0.1);
+  border-color: var(--accent-blue);
+  box-shadow: 0 8px 30px rgba(59, 130, 246, 0.15);
 }
 
 .session-card.status-connected {
-  border-color: rgba(0, 255, 159, 0.3);
+  border-color: rgba(59, 130, 246, 0.3);
 }
 
 .card-header {
@@ -232,13 +232,13 @@ onMounted(() => {
 }
 
 .status-badge.status-connected {
-  background: rgba(0, 255, 159, 0.1);
-  color: var(--accent-green);
-  border: 1px solid rgba(0, 255, 159, 0.3);
+  background: rgba(59, 130, 246, 0.1);
+  color: var(--accent-blue);
+  border: 1px solid rgba(59, 130, 246, 0.3);
 }
 
 .status-badge.status-connected .status-dot {
-  background: var(--accent-green);
+  background: var(--accent-blue);
   animation: pulse 2s ease-in-out infinite;
 }
 
