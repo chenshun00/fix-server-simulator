@@ -5,16 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="07bf37fd-e4b6-4b6b-a568-19558b1a12e6" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/fixsimulator/controller/MessageController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/fixsimulator/controller/MessageController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/fixsimulator/repository/FixMessageRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/fixsimulator/repository/FixMessageRepository.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/fixsimulator/service/AutoResponseService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/fixsimulator/service/AutoResponseService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/fixsimulator/service/FixMessageService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/fixsimulator/service/FixMessageService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/fixsimulator/service/ParsedFieldService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/fixsimulator/service/ParsedFieldService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/fixsimulator/service/ResponseService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/fixsimulator/service/ResponseService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/static/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/static/js/controllers/message-query.controller.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/js/controllers/message-query.controller.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/static/js/services/message.service.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/js/services/message.service.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/static/js/services/reply.service.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/js/services/reply.service.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -44,6 +35,7 @@
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="nodejs_package_manager_path" value="npm" />
     <property name="project.structure.last.edited" value="Global Libraries" />
     <property name="project.structure.proportion" value="0.0" />
     <property name="project.structure.side.proportion" value="0.2" />
@@ -67,11 +59,22 @@
       <option name="presentableId" value="Default" />
       <updated>1769263136086</updated>
       <workItem from="1769263139400" duration="44000" />
-      <workItem from="1769263192387" duration="3887000" />
+      <workItem from="1769263192387" duration="7323000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
 </project>

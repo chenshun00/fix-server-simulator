@@ -27,7 +27,7 @@ public class FixConfig {
             // Create session for acceptor
             SessionID sessionID = new SessionID(
                 "FIX.4.2",  // BeginString
-                "SIMULATOR",  // SenderCompID
+                "GSIMULATOR",  // SenderCompID
                 "GATEWAY"  // TargetCompID
             );
 
@@ -35,7 +35,7 @@ public class FixConfig {
             settings.setString(sessionID, "ConnectionType", "acceptor");
             settings.setLong(sessionID, "SocketAcceptPort", 9876);
             settings.setString(sessionID, "BeginString", "FIX.4.2");
-            settings.setString(sessionID, "SenderCompID", "SIMULATOR");
+            settings.setString(sessionID, "SenderCompID", "GSIMULATOR");
             settings.setString(sessionID, "TargetCompID", "GATEWAY");
 
             log.info("Created FIX SessionSettings with session: {}", sessionID);
